@@ -8,11 +8,17 @@
 
 import UIKit
 
+@objc protocol TaskDetailViewControllerDelegate {
+    optional func taskDetailEdited()
+}
+
 class TaskDetailViewController: UIViewController {
     
     @IBOutlet weak var taskTextField: UITextField!
     @IBOutlet weak var subtaskTextField: UITextField!
     @IBOutlet weak var dueDatePicker: UIDatePicker!
+    
+    var delegate: TaskDetailViewControllerDelegate?
     
     var detailTaskModel:TaskModel!
 
@@ -20,6 +26,8 @@ class TaskDetailViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+        self.view.backgroundColor = UIColor(patternImage: UIImage(named: "Background")!)
         
         self.taskTextField.text = detailTaskModel.task
         self.subtaskTextField.text = detailTaskModel.subtask
@@ -36,15 +44,15 @@ class TaskDetailViewController: UIViewController {
     }
 
     @IBAction func donBarButtonItemPressed(sender: UIBarButtonItem) {
-        let appDelegate = (UIApplication.sharedApplication().delegate) as AppDelegate
         detailTaskModel.task = taskTextField.text
         detailTaskModel.subtask = subtaskTextField.text
         detailTaskModel.date = dueDatePicker.date
         detailTaskModel.completed = detailTaskModel.completed
         
-        appDelegate.saveContext()
+        ModelManager.instance.saveContext()
         
         self.navigationController?.popViewControllerAnimated(true)
+        delegate?.taskDetailEdited!()
     }
     
 }
